@@ -9,9 +9,22 @@ import sys
 sys.path.insert(0, '.')
 
 import os
-from docx import Document
-from docx.shared import Pt, Cm
-from docx.enum.text import WD_ALIGN_PARAGRAPH
+try:
+    from docx import Document
+    from docx.shared import Pt, Cm
+    from docx.enum.text import WD_ALIGN_PARAGRAPH
+    _DOCX_AVAILABLE = True
+except Exception:
+    Document = None
+    Pt = None
+    Cm = None
+    WD_ALIGN_PARAGRAPH = None
+    _DOCX_AVAILABLE = False
+    print("python-docx not installed. Install with: pip install python-docx")
+
+if not _DOCX_AVAILABLE:
+    import sys as _sys
+    _sys.exit(1)
 
 os.makedirs("results", exist_ok=True)
 
@@ -19,7 +32,6 @@ print("Setting up document...")
 
 doc = Document()
 
-# Page margins
 for section in doc.sections:
     section.top_margin    = Cm(2.5)
     section.bottom_margin = Cm(2.5)
@@ -37,9 +49,9 @@ def add_para(text, bold=False, italic=False,
     p = doc.add_paragraph()
     p.alignment = align
     run = p.add_run(text)
-    run.bold       = bold
-    run.italic     = italic
-    run.font.size  = Pt(11)
+    run.bold      = bold
+    run.italic    = italic
+    run.font.size = Pt(11)
     return p
 
 def add_caption(text):
@@ -350,8 +362,7 @@ add_para(
     "with non-homogeneous agents failing to converge on a "
     "positive-measure set of instances. These analytical results "
     "provide theoretical grounding for the computational findings "
-    "presented in Chapter 4 and identify the heterogeneous setting "
-    "as a particularly important frontier for computational exploration."
+    "presented in Chapter 4."
 )
 
 add_heading("2.5 Multi-Battlefield Extensions", level=2)
@@ -363,8 +374,7 @@ add_para(
     "success function. Their water-filling characterisation of best "
     "response strategies offers a complementary analytical lens on "
     "best response computation in contest-type games. Their Stackelberg "
-    "framing — studying sequential rather than simultaneous play — "
-    "suggests a natural extension of the present work and is noted "
+    "framing suggests a natural extension of the present work noted "
     "as a direction for future research in Chapter 6."
 )
 
@@ -529,14 +539,17 @@ add_para(
     "equilibrium with absolute error below 1e-4, validating the "
     "computational framework. The synchronous and asynchronous rules "
     "converge in 5-6 iterations, while the inertial rule requires 23 "
-    "iterations due to its partial updating mechanism. Figure 1 shows "
-    "the convergence trajectories and Figure 3 shows the phase portrait "
-    "confirming the Nash equilibrium as the unique fixed point."
+    "iterations due to its partial updating mechanism."
 )
 add_caption(
     "Figure 1: Synchronous BRD convergence trajectory — 2-player "
     "symmetric contest (V=10, r=1). Both players converge to x*=2.5 "
     "within 6 iterations."
+)
+add_caption(
+    "Figure 2: Inertial BRD (l=0.5) convergence trajectory — "
+    "2-player symmetric contest (V=10, r=1). Both players converge "
+    "to x*=2.5 within 23 iterations."
 )
 add_caption(
     "Figure 3: Phase portrait of 2-player contest (r=1). Arrows "
@@ -552,7 +565,7 @@ add_para(
 )
 
 add_table(
-    ["r", "Conv. Rate", "Mean Iters", "Total Effort", "Spectral Radius"],
+    ["r", "Conv. Rate", "Mean Iters", "Total Effort", "Spectral R"],
     [
         ["0.5", "100%", "4.2",  "2.50",  "0.0002"],
         ["1.0", "100%", "5.3",  "5.00",  "0.0032"],
@@ -572,14 +585,17 @@ add_para(
     "r in {0.5, 1.0, 1.5, 2.0} with spectral radii well below unity. "
     "Second, a sharp non-convergence point exists at r = 3.0 with 0% "
     "convergence across all 20 initialisations. Third, rent dissipation "
-    "rises monotonically with r in the convergent region, partially "
-    "consistent with Nitzan (1994). Fourth, convergence speed decreases "
-    "as r increases, reflecting the rising spectral radius as the "
-    "system approaches the stability boundary."
+    "rises monotonically with r in the convergent region. Fourth, "
+    "convergence speed decreases as r increases."
 )
 add_caption(
     "Figure 4: Convergence rate vs. r (n=2). Complete failure at "
     "r=3.0 surrounded by full convergence at r=2.0 and r=3.5."
+)
+add_caption(
+    "Figure 5: Mean iterations to convergence vs. r (n=2). "
+    "Convergence slows as r increases toward the instability "
+    "boundary."
 )
 add_caption(
     "Figure 6: Rent dissipation vs. r showing monotonic increase "
@@ -593,7 +609,7 @@ add_para(
 )
 
 add_table(
-    ["n", "Conv. Rate", "Mean Iters", "Sim. Total", "Analytical Total"],
+    ["n", "Conv. Rate", "Mean Iters", "Sim. Total", "Analytical"],
     [
         ["2",  "100%", "5.3",    "5.00",  "5.00"],
         ["3",  "100%", "22.0",   "6.67",  "6.67"],
@@ -609,21 +625,21 @@ add_caption(
 doc.add_paragraph()
 
 add_para(
-    "Three findings emerge. First, a clear convergence threshold "
-    "exists between n = 5 and n = 10 — the largest player count for "
-    "which synchronous dynamics converge at r = 1.0 is n = 5, "
-    "requiring 2010 iterations and indicating proximity to the "
-    "stability boundary. Second, where dynamics fail, simulated "
-    "total effort diverges from analytical predictions, indicating "
-    "the dynamics explore qualitatively different regions of strategy "
-    "space rather than simply converging slowly. Third, n = 5 has "
-    "spectral radius 1.49 — formally unstable by the "
-    "Szidarovszky-Okuguchi criterion — yet converges in practice, "
-    "confirming that their condition is sufficient but not necessary."
+    "Three findings emerge. A clear convergence threshold exists "
+    "between n = 5 and n = 10. Where dynamics fail, simulated total "
+    "effort diverges from analytical predictions. The n = 5 case has "
+    "spectral radius 1.49 — formally unstable — yet converges in "
+    "practice, confirming the Szidarovszky-Okuguchi condition is "
+    "sufficient but not necessary."
 )
 add_caption(
     "Figure 7: Convergence rate vs. n (r=1). Sharp drop from 100% "
     "at n=5 to 0% at n=10."
+)
+add_caption(
+    "Figure 8: Mean iterations to convergence vs. n (r=1). "
+    "Convergence slows dramatically as n increases toward the "
+    "instability threshold."
 )
 add_caption(
     "Figure 9: Total effort vs. n comparing simulation against "
@@ -654,46 +670,30 @@ doc.add_paragraph()
 add_para(
     "The Cornes and Hartley (2005) prediction is confirmed: the "
     "higher-valuation player consistently exerts greater equilibrium "
-    "effort. Under both mild and strong asymmetry, the effort ratio "
-    "precisely matches the valuation ratio — P2/P1 effort = 1.50 "
-    "for V2/V1 = 1.50, and P2/P1 effort = 9.0 for V2/V1 = 9.0. "
+    "effort, with effort ratios precisely matching valuation ratios. "
     "Convergence remains 100% across all heterogeneous cases at "
-    "r = 1.0, indicating that valuation asymmetry alone does not "
-    "destabilise best response dynamics."
+    "r = 1.0."
 )
 add_caption(
     "Figure 10: Equilibrium effort vs. Player 2 valuation. "
     "Player 2 effort rises monotonically; Player 1 effort shows "
     "non-monotonic response peaking at the symmetric point."
 )
+add_caption(
+    "Figure 11: Equilibrium efforts under symmetric vs asymmetric "
+    "valuations. Player 2 effort consistently exceeds Player 1 "
+    "when V2 > V1, confirming Cornes and Hartley (2005)."
+)
 
 add_heading("4.5 High Decisiveness Analysis (Experiment 5)", level=2)
 add_para(
     "Experiment 5 investigated the non-convergence at r = 3.0 through "
     "a fine-grained r sweep, trajectory inspection, and inertial "
-    "dynamics testing."
-)
-add_para(
-    "The fine-grained sweep (r in {2.0, 2.2, 2.4, 2.6, 2.8, 3.0, "
-    "3.2, 3.5}) revealed that r = 3.0 is an isolated non-convergence "
-    "point: r = 2.8 and r = 3.2 both converge at 100%, with only "
-    "r = 3.0 producing complete failure. This is a knife-edge "
-    "resonance point rather than a phase transition."
-)
-add_para(
-    "Trajectory inspection reveals explosive instability at r = 3.0: "
-    "within 10 iterations, efforts oscillate wildly between near-zero "
-    "and near-maximum values. One player is driven to zero while the "
-    "other dominates, before both collapse to near-zero. This "
-    "qualitatively resembles the sensitive dependence on initial "
-    "conditions documented by Hopkins and Kornienko (2010)."
-)
-add_para(
-    "All four inertial learning rates tested (lambda in "
-    "{0.8, 0.5, 0.3, 0.1}) produce 0% convergence at r = 3.0, "
-    "demonstrating that the instability is intrinsic to the "
-    "mathematical structure at this point and cannot be mitigated "
-    "by slowing the update process."
+    "dynamics testing. The fine-grained sweep revealed r = 3.0 is an "
+    "isolated knife-edge point: r = 2.8 and r = 3.2 both converge at "
+    "100%. Trajectory inspection reveals explosive instability within "
+    "10 iterations. All four inertial learning rates tested produce "
+    "0% convergence at r = 3.0."
 )
 add_caption(
     "Figure 12: Fine-grained convergence rate vs. r. Knife-edge "
@@ -731,13 +731,10 @@ add_caption(
 doc.add_paragraph()
 
 add_para(
-    "Three structural features emerge. First, r = 0.5 is a universal "
-    "stability anchor with 100% convergence for all n. Second, the "
-    "instability zone expands dramatically with n: for n = 2, only "
-    "r = 3.0 fails; for n >= 10, virtually everything between r = 1.0 "
-    "and r = 4.0 fails. Third, r = 5.0 produces universal convergence "
-    "but to a corner solution of zero effort by all players, as extreme "
-    "decisiveness renders investment unprofitable."
+    "Three structural features emerge: r = 0.5 is a universal "
+    "stability anchor; the instability zone expands dramatically "
+    "with n; and r = 5.0 produces universal convergence to a "
+    "zero-effort corner solution."
 )
 add_caption(
     "Figure 15: Full convergence heatmap across r x n parameter "
@@ -761,18 +758,14 @@ add_heading("5.1 Informing Existing Theory", level=2)
 add_para(
     "The simulation results inform existing theoretical understanding "
     "in two principal ways. First, the monotonic relationship between "
-    "spectral radius and convergence speed — visible across Tables 2 "
-    "and 3 — provides empirical grounding for the intuition that the "
-    "contraction mapping condition not only guarantees convergence but "
-    "quantitatively predicts its rate. The spectral radius thus "
-    "functions as a continuous convergence speed measure, not merely "
-    "a binary stability indicator. Second, the rent dissipation "
-    "results partially confirm Nitzan's (1994) non-monotonicity "
-    "prediction: total effort rises monotonically with r in the "
-    "convergent region and the very high r regime produces zero "
-    "effort, consistent with the descending portion of his "
-    "dissipation curve — though the non-convergent intermediate "
-    "region precludes a complete mapping of the full curve."
+    "spectral radius and convergence speed provides empirical grounding "
+    "for the intuition that the contraction mapping condition not only "
+    "guarantees convergence but quantitatively predicts its rate. "
+    "Second, the rent dissipation results partially confirm Nitzan's "
+    "(1994) non-monotonicity prediction: total effort rises "
+    "monotonically with r in the convergent region, and the very high "
+    "r regime produces zero effort consistent with the descending "
+    "portion of his dissipation curve."
 )
 
 add_heading("5.2 Extending Existing Theory", level=2)
@@ -783,20 +776,14 @@ add_para(
     "that this condition is not necessary for convergence. Dynamics can "
     "converge despite a spectral radius above unity, meaning the true "
     "convergence region is larger than the contraction mapping "
-    "framework predicts. This extends the theoretical picture "
-    "substantively: the contraction condition is a conservative "
-    "sufficient condition, and identifying the tighter necessary "
-    "and sufficient conditions remains an open theoretical problem "
-    "motivated by these findings."
+    "framework predicts."
 )
 add_para(
     "The heterogeneous valuation results extend Cornes and Hartley "
     "(2005) computationally. Their proportionality prediction is "
     "confirmed and the additional finding — that Player 1's effort "
     "is non-monotonic in Player 2's valuation — represents a novel "
-    "observation not present in their analytical results. This "
-    "non-monotonic strategic response warrants formal analytical "
-    "characterisation as a direction for future work."
+    "observation not present in their analytical results."
 )
 
 add_heading("5.3 Challenging Existing Theory", level=2)
@@ -806,34 +793,27 @@ add_para(
     "equilibria are reachable through natural learning. The unique "
     "Nash equilibrium exists at r = 3.0 but is computationally "
     "unreachable through best response learning from any initial "
-    "condition tested. The explosive instability — qualitatively "
-    "different from simple cycling — and its resistance to inertial "
-    "stabilisation suggest a fundamental structural breakdown at "
-    "this point."
+    "condition tested."
 )
 add_para(
     "The expanding instability zone with increasing n challenges the "
     "use of symmetric Nash equilibria as behavioural predictions in "
     "large contests. For n >= 10 at r = 1.0, the theoretically unique "
     "Nash equilibrium is analytically well-defined but dynamically "
-    "inaccessible through best response learning. This provides a "
-    "structural explanation for the systematic deviations from Nash "
-    "predictions documented experimentally by Chowdhury and Sheremeta "
-    "(2011)."
+    "inaccessible, providing a structural explanation for the "
+    "systematic deviations from Nash predictions documented by "
+    "Chowdhury and Sheremeta (2011)."
 )
 
 add_heading("5.4 Limitations", level=2)
 add_para(
-    "Several limitations should be acknowledged. First, parameter "
-    "sweeps use synchronous dynamics — asynchronous dynamics may "
-    "exhibit different convergence boundaries and warrant systematic "
-    "investigation. Second, the 500-iteration limit may misclassify "
-    "slowly-converging cases as non-convergent, as demonstrated by "
-    "the n = 5 case requiring 2010 iterations. Third, the discrete "
-    "parameter grid may miss features between sampled points. Fourth, "
-    "the analysis focuses on pure strategy Nash equilibria; mixed "
-    "strategy equilibria and their dynamic properties are not "
-    "considered."
+    "Several limitations should be acknowledged. Parameter sweeps "
+    "use synchronous dynamics — asynchronous dynamics may exhibit "
+    "different convergence boundaries. The 500-iteration limit may "
+    "misclassify slowly-converging cases as non-convergent. The "
+    "discrete parameter grid may miss features between sampled "
+    "points. The analysis focuses on pure strategy Nash equilibria; "
+    "mixed strategy equilibria are not considered."
 )
 page_break()
 print("Chapter 5 done. Writing Chapter 6...")
@@ -862,8 +842,7 @@ add_bullet(
 )
 add_bullet(
     "A convergence threshold between n = 5 and n = 10 at r = 1.0 "
-    "shows how competition intensity interacts with decisiveness "
-    "to determine stability."
+    "shows how competition intensity interacts with decisiveness."
 )
 add_bullet(
     "Cornes and Hartley's (2005) proportionality prediction is "
@@ -885,13 +864,12 @@ add_para(
     "at r = 3.0 warrants formal mathematical analysis to characterise "
     "the exact mechanism of explosive instability and identify "
     "necessary and sufficient conditions for convergence. Second, the "
-    "Stackelberg extension of Liu et al. (2025) — studying whether "
-    "sequential commitment changes convergence behaviour — represents "
-    "a natural follow-up. Third, stochastic best response dynamics "
-    "motivated by Lim and Matros (2009) may rescue convergence in "
-    "unstable regimes. Fourth, extending the framework to "
-    "multi-battlefield settings would connect these findings to the "
-    "growing literature on proportional multi-contest games."
+    "Stackelberg extension of Liu et al. (2025) represents a natural "
+    "follow-up. Third, stochastic best response dynamics motivated by "
+    "Lim and Matros (2009) may rescue convergence in unstable regimes. "
+    "Fourth, extending the framework to multi-battlefield settings "
+    "would connect these findings to the growing literature on "
+    "proportional multi-contest games."
 )
 page_break()
 print("Chapter 6 done. Writing references...")
@@ -918,12 +896,10 @@ refs = [
     "lottery contests. ACM Conference on Economics and Computation. "
     "arXiv:2305.10881.",
 
-    "Hopkins, E., & Kornienko, T. (2010). Which inequality? The "
-    "inequality of endowments versus the inequality of rewards. "
+    "Hopkins, E., & Kornienko, T. (2010). Which inequality? "
     "American Economic Journal: Microeconomics, 2(3), 106-137.",
 
-    "Judd, K. L. (1998). Numerical methods in economics. "
-    "MIT Press.",
+    "Judd, K. L. (1998). Numerical methods in economics. MIT Press.",
 
     "Lim, W., & Matros, A. (2009). Contests with a stochastic "
     "number of players. Games and Economic Behavior, 67(2), 584-597.",
@@ -964,17 +940,16 @@ for ref in refs:
 # SAVE
 # ══════════════════════════════════════════════════════════
 
-print("Saving dissertation...")
+print("Saving dissertation draft...")
 
 output_path = "results/dissertation_draft.docx"
 doc.save(output_path)
 
 print()
 print("=" * 55)
-print(f"Dissertation saved to: {output_path}")
-print("Chapters: 6")
-print("Tables: 5")
-print("Figure captions: 16")
+print(f"Saved to: {output_path}")
+print("Chapters:   6")
+print("Tables:     5")
+print("Captions:   16 figures")
 print("References: 14")
-print("Estimated word count: ~10,500 words")
 print("=" * 55)
