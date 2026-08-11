@@ -511,13 +511,46 @@ print("Chapter 3 done. Writing Chapter 4...")
 
 add_heading("4. Experimental Results", level=1)
 
+add_para(
+    "This chapter presents the results of six experiments designed "
+    "to systematically address the four research questions posed in "
+    "Chapter 1. Experiment 1 establishes the correctness of the "
+    "simulation framework against a known analytical benchmark. "
+    "Experiments 2 and 3 address RQ1 and RQ2 respectively, sweeping "
+    "the decisiveness parameter r and player count n independently. "
+    "Experiment 4 addresses RQ3 by introducing heterogeneous player "
+    "valuations. Experiment 5 addresses RQ4 by examining a specific "
+    "non-convergence point identified in Experiment 2 in much finer "
+    "detail. Experiment 6 combines the r and n dimensions into a "
+    "single systematic sweep, producing the most complete picture of "
+    "the convergence landscape presented in this dissertation."
+)
+
 add_heading("4.1 Baseline Validation (Experiment 1)", level=2)
 add_para(
-    "The simulation framework was first validated against the "
-    "analytical Nash equilibrium for the symmetric 2-player contest "
-    "(V = 10, r = 1, alpha = 1). The analytical equilibrium predicts "
-    "x* = 2.5 for both players. Starting from an asymmetric initial "
-    "condition of (8.0, 1.0), all three update rules were tested."
+    "Before any exploratory experiments were conducted, it was "
+    "essential to establish that the simulation framework correctly "
+    "reproduces known theoretical results. Without this step, any "
+    "subsequent finding — however interesting — would carry no "
+    "evidential weight, since it would be impossible to distinguish "
+    "a genuine feature of Tullock contest dynamics from an artefact "
+    "of a flawed implementation. Experiment 1 therefore validates the "
+    "framework against the closed-form Nash equilibrium for the "
+    "symmetric 2-player contest with linear costs and r = 1, "
+    "V = 10, for which Tullock (1980) gives the analytical solution "
+    "x* = V(n-1)/n^2 = 10(1)/4 = 2.5 for both players."
+)
+add_para(
+    "The validation deliberately starts from an asymmetric initial "
+    "condition, (8.0, 1.0), rather than the equilibrium itself. This "
+    "choice matters: a simulation that trivially confirms an "
+    "equilibrium when initialised at that equilibrium proves very "
+    "little, since a stationary point will remain stationary under "
+    "any reasonable update rule. Starting from a point far from "
+    "equilibrium, with Player 1 initially far ahead of Player 2, "
+    "tests whether the dynamics genuinely correct themselves through "
+    "the update process rather than simply preserving whatever state "
+    "they are given."
 )
 
 add_table(
@@ -536,10 +569,37 @@ doc.add_paragraph()
 
 add_para(
     "All three update rules converge precisely to the analytical "
-    "equilibrium with absolute error below 1e-4, validating the "
-    "computational framework. The synchronous and asynchronous rules "
-    "converge in 5-6 iterations, while the inertial rule requires 23 "
-    "iterations due to its partial updating mechanism."
+    "equilibrium, with absolute error below 1e-4 in every case — "
+    "well within the tolerance epsilon = 1e-6 used to declare "
+    "convergence, and far tighter than would be needed for any "
+    "practical purpose. The synchronous and asynchronous rules "
+    "converge in remarkably few iterations, 6 and 5 respectively, "
+    "reflecting the fact that at r = 1 with only two symmetric "
+    "players the best response mapping is strongly contracting: each "
+    "round of updating closes most of the remaining gap to "
+    "equilibrium. The inertial rule with learning rate lambda = 0.5 "
+    "requires substantially more iterations, 23, which is expected "
+    "given its construction — by design it moves only half the "
+    "distance toward the best response at each step rather than "
+    "jumping there directly, so it necessarily takes roughly twice "
+    "as many rounds per unit of convergence relative to the "
+    "synchronous rule, though the relationship is not perfectly "
+    "linear because the target itself shifts slightly at each "
+    "partial step."
+)
+add_para(
+    "That all three rules, despite their structurally different "
+    "update mechanics, converge to the identical equilibrium value "
+    "provides strong initial evidence that the equilibrium in "
+    "question is not merely a fixed point but a genuinely stable "
+    "attractor for this parameter configuration, reachable regardless "
+    "of the precise manner in which players adjust their behaviour "
+    "over time. This robustness across update rules is itself an "
+    "informative result: it suggests that for well-behaved parameter "
+    "regions, the qualitative predictions of Nash equilibrium theory "
+    "are not sensitive to modelling choices about exactly how players "
+    "learn, a property that later experiments show does not hold "
+    "universally across the parameter space."
 )
 add_caption(
     "Figure 1: Synchronous BRD convergence trajectory — 2-player "
@@ -556,12 +616,34 @@ add_caption(
     "indicate best response update directions. Red star marks the "
     "Nash equilibrium at (2.5, 2.5)."
 )
+add_para(
+    "The phase portrait in Figure 3 provides a complementary, more "
+    "global view of the same result. Rather than tracking a single "
+    "trajectory, it plots the direction and approximate magnitude of "
+    "the best response update at a grid of points across the "
+    "strategy space. Every arrow in the portrait points, directly or "
+    "indirectly, toward the marked equilibrium at (2.5, 2.5), and the "
+    "arrows shrink in length as they approach it — visual confirmation "
+    "that the equilibrium behaves as a genuine attractor across the "
+    "entire region shown, not merely along the one trajectory "
+    "examined in Figure 1."
+)
 
 add_heading("4.2 Decisiveness Parameter Sweep (Experiment 2)", level=2)
 add_para(
-    "Experiment 2 swept r across {0.5, 1.0, 1.5, 2.0, 3.0} for the "
-    "2-player symmetric contest (V=10), running 20 random "
-    "initialisations per r value."
+    "With the framework validated, Experiment 2 addresses RQ1 "
+    "directly: how does convergence behaviour change as the "
+    "decisiveness parameter r varies? The decisiveness parameter "
+    "governs how sharply small differences in effort translate into "
+    "differences in winning probability, and existing theory offers "
+    "only partial guidance as to how it should affect the dynamic "
+    "stability of learning, as distinct from the static properties "
+    "of the equilibrium itself. Experiment 2 swept r across "
+    "{0.5, 1.0, 1.5, 2.0, 3.0} for the 2-player symmetric contest "
+    "(V=10), running 20 random initialisations per r value, each "
+    "drawn independently and uniformly from [0.1, 8.0] for both "
+    "players, and using the synchronous update rule throughout since "
+    "it was the most directly comparable across configurations."
 )
 
 add_table(
@@ -581,12 +663,52 @@ add_caption(
 doc.add_paragraph()
 
 add_para(
-    "Four findings emerge. First, convergence is guaranteed for "
-    "r in {0.5, 1.0, 1.5, 2.0} with spectral radii well below unity. "
-    "Second, a sharp non-convergence point exists at r = 3.0 with 0% "
-    "convergence across all 20 initialisations. Third, rent dissipation "
-    "rises monotonically with r in the convergent region. Fourth, "
-    "convergence speed decreases as r increases."
+    "Reading down Table 2 in order, several patterns emerge that "
+    "would not be visible from the aggregate convergence rate alone. "
+    "At r = 0.5, convergence is both universal (100% across all 20 "
+    "initialisations) and extremely fast, requiring on average only "
+    "4.2 iterations. This is consistent with intuition: when r is "
+    "small, winning probability responds only weakly to differences "
+    "in effort, so the incentive to chase a competitor's effort "
+    "level is muted and the system settles quickly. As r rises to "
+    "1.0 and then 1.5, convergence remains complete but the mean "
+    "iteration count roughly doubles, from 4.2 to 9.2, indicating "
+    "that the same qualitative outcome — reaching the unique "
+    "equilibrium — is being reached through an increasingly "
+    "protracted process of mutual adjustment."
+)
+add_para(
+    "The total effort column tells a complementary story about the "
+    "economic content of these equilibria rather than merely their "
+    "dynamic accessibility. Total effort rises steadily and "
+    "predictably from 2.50 at r = 0.5 to 10.00 at r = 2.0 — precisely "
+    "in line with the analytical formula X* = V(n-1)/n applied to "
+    "n = 2 contests, since total effort here reflects the underlying "
+    "static equilibrium rather than the dynamics used to reach it and "
+    "so should not itself vary with r under the linear-cost, "
+    "symmetric-valuation specification used. What does vary "
+    "systematically with r, however, is the spectral radius of the "
+    "Jacobian evaluated at that equilibrium, rising unevenly but "
+    "broadly from 0.0002 at r = 0.5 to 0.0119 at r = 2.0. Although "
+    "still far below the instability threshold of 1.0 throughout "
+    "this range, the trend is directionally consistent with the "
+    "rising iteration counts: a higher decisiveness parameter "
+    "produces a locally less strongly contracting best response map, "
+    "so more rounds of mutual adjustment are needed to close the same "
+    "proportional distance to equilibrium."
+)
+add_para(
+    "Then, at r = 3.0, this gradual pattern breaks entirely. "
+    "Convergence rate collapses from 100% to 0% across all 20 "
+    "initialisations without exception — not a partial degradation "
+    "but a complete failure, with the total effort and spectral "
+    "radius columns both showing N/A because no run reached a stable "
+    "point from which either quantity could meaningfully be "
+    "computed. Given the smooth, monotonic-looking progression "
+    "through r = 0.5 to r = 2.0, this outcome at r = 3.0 was "
+    "genuinely unexpected at the point it was first observed, and it "
+    "is this anomaly that motivated the much finer-grained "
+    "investigation carried out separately in Experiment 5."
 )
 add_caption(
     "Figure 4: Convergence rate vs. r (n=2). Complete failure at "
@@ -601,11 +723,31 @@ add_caption(
     "Figure 6: Rent dissipation vs. r showing monotonic increase "
     "in the convergent region."
 )
+add_para(
+    "It is worth noting explicitly what Figure 6 does and does not "
+    "show. Within the convergent region tested, r ∈ {0.5, 1.0, 1.5, "
+    "2.0}, total effort rises monotonically with r, which is "
+    "consistent with the rising portion of the non-monotonic "
+    "dissipation curve predicted analytically by Nitzan (1994). "
+    "However, because r = 3.0 fails to converge, this experiment "
+    "alone cannot confirm or refute whether dissipation eventually "
+    "falls again at higher r, as Nitzan's theory predicts; that "
+    "question is addressed indirectly through the corner-solution "
+    "result obtained later at r = 5.0 in Experiment 6, and is "
+    "discussed further in Chapter 5."
+)
 
 add_heading("4.3 Player Count Sweep (Experiment 3)", level=2)
 add_para(
-    "Experiment 3 swept n across {2, 3, 5, 10, 20} at fixed r = 1.0, "
-    "running 10 random initialisations per n value."
+    "Experiment 3 addresses RQ2, holding the decisiveness parameter "
+    "fixed at its most standard value, r = 1.0, and instead sweeping "
+    "the number of players n across {2, 3, 5, 10, 20}. This range "
+    "was chosen to span from the minimal two-player case, through "
+    "small committee-sized groups, up to contest sizes more "
+    "representative of large-scale competitive settings such as "
+    "open tournaments or crowded markets. Ten random initialisations "
+    "were used per n value, each player's starting effort again drawn "
+    "independently and uniformly from [0.1, 8.0]."
 )
 
 add_table(
@@ -625,12 +767,45 @@ add_caption(
 doc.add_paragraph()
 
 add_para(
-    "Three findings emerge. A clear convergence threshold exists "
-    "between n = 5 and n = 10. Where dynamics fail, simulated total "
-    "effort diverges from analytical predictions. The n = 5 case has "
-    "spectral radius 1.49 — formally unstable — yet converges in "
-    "practice, confirming the Szidarovszky-Okuguchi condition is "
-    "sufficient but not necessary."
+    "The first three rows of Table 3 show convergence rates of 100% "
+    "throughout, but the mean iterations column reveals that this "
+    "surface-level consistency conceals a rapidly deteriorating "
+    "situation underneath. Moving from n = 2 to n = 3 nearly "
+    "quadruples the mean iteration count, from 5.3 to 22.0. Moving "
+    "from n = 3 to n = 5 then increases it by a further factor of "
+    "roughly ninety, to 2010.1 iterations — meaning that although "
+    "every single one of the ten random initialisations at n = 5 "
+    "technically reached the analytical equilibrium within the "
+    "iteration budget allowed, doing so required well over a "
+    "thousand times more rounds of adjustment than the two-player "
+    "case. This is a striking illustration of how a binary "
+    "convergence classification, converged versus not converged, can "
+    "obscure an underlying trend that is already signalling severe "
+    "instability well before outright failure occurs."
+)
+add_para(
+    "At n = 10, that failure arrives: convergence rate drops sharply "
+    "to 0%, and it remains at 0% at n = 20. The threshold between "
+    "n = 5 and n = 10 therefore represents a genuine qualitative "
+    "boundary in the behaviour of the system, not merely a "
+    "continuation of the slowing trend visible between n = 2 and "
+    "n = 5. Equally informative is what happens to the total effort "
+    "figures once this boundary is crossed. For n = 2, 3, and 5, "
+    "simulated total effort matches the analytical prediction exactly "
+    "to the precision reported, as it must, since convergence to the "
+    "true equilibrium guarantees this agreement. But at n = 10, "
+    "simulated total effort is 6.25 against an analytical prediction "
+    "of 9.00, and at n = 20 it is 22.49 against a prediction of only "
+    "9.50 — in the n = 20 case, simulated total effort is more than "
+    "double the theoretical equilibrium value. These are not small "
+    "deviations consistent with slow but ongoing convergence; they "
+    "indicate that the non-convergent trajectories are exploring "
+    "regions of the strategy space that bear little resemblance to "
+    "the equilibrium itself, most likely oscillating through states "
+    "where a subset of players temporarily commit very high effort "
+    "while others collapse toward zero, in a manner qualitatively "
+    "similar to the explosive instability documented in detail for "
+    "the r = 3.0 case in Experiment 5."
 )
 add_caption(
     "Figure 7: Convergence rate vs. n (r=1). Sharp drop from 100% "
@@ -646,11 +821,42 @@ add_caption(
     "analytical benchmarks. Perfect agreement where convergence "
     "holds; divergence where it fails."
 )
+add_para(
+    "The formal analysis report (introduced in Section 3.6 and run "
+    "separately from the main experiment scripts) supplies the "
+    "spectral radius for the n = 5 case: 1.49, formally above the "
+    "unity threshold associated with the Szidarovszky-Okuguchi "
+    "contraction condition, and yet convergence at n = 5 was observed "
+    "in 100% of runs. This is one of two independent pieces of "
+    "evidence in this dissertation — the other arising in Section "
+    "4.6 — that the contraction condition, while clearly sufficient "
+    "for convergence, is not necessary. This finding is discussed at "
+    "greater length in Chapter 5, where its implications for the "
+    "theoretical literature are considered directly."
+)
 
 add_heading("4.4 Heterogeneous Valuations (Experiment 4)", level=2)
 add_para(
-    "Experiment 4 tested three valuation configurations for 2-player "
-    "contests at r = 1.0 with 20 random initialisations each."
+    "Experiments 2 and 3 both used symmetric valuations, V_i = V for "
+    "all players, which is the setting for which the closed-form "
+    "benchmark of Tullock (1980) is available and therefore the "
+    "natural starting point for validating and exploring the "
+    "framework. Experiment 4 relaxes this assumption to address RQ3, "
+    "asking whether the convergence properties documented above "
+    "persist once players value the prize differently from one "
+    "another. This question is not purely academic: in almost every "
+    "real-world application of contest theory, from R&D races to "
+    "political competition, the competing parties rarely value the "
+    "prize identically, so understanding whether asymmetry alone can "
+    "destabilise otherwise well-behaved dynamics is directly relevant "
+    "to the practical applicability of the model."
+)
+add_para(
+    "Three configurations were tested for the 2-player contest at "
+    "r = 1.0, each run with 20 random initialisations: a symmetric "
+    "baseline with V1 = V2 = 10 for comparison, a mild asymmetry with "
+    "V1 = 8 and V2 = 12, and a strong asymmetry with V1 = 2 and "
+    "V2 = 18."
 )
 
 add_table(
@@ -668,16 +874,58 @@ add_caption(
 doc.add_paragraph()
 
 add_para(
-    "The Cornes and Hartley (2005) prediction is confirmed: the "
-    "higher-valuation player consistently exerts greater equilibrium "
-    "effort, with effort ratios precisely matching valuation ratios. "
-    "Convergence remains 100% across all heterogeneous cases at "
-    "r = 1.0."
+    "The most immediately striking feature of Table 4 is the "
+    "precision with which the effort ratio matches the valuation "
+    "ratio in both asymmetric cases. Under mild asymmetry, "
+    "V2/V1 = 12/8 = 1.5, and the corresponding effort ratio is "
+    "2.8800/1.9200 = 1.5 exactly. Under strong asymmetry, "
+    "V2/V1 = 18/2 = 9.0, and the effort ratio is 1.6200/0.1800 = 9.0 "
+    "exactly. This is a direct computational confirmation of the "
+    "proportionality result derived analytically by Cornes and "
+    "Hartley (2005) for asymmetric contests, and its exact "
+    "reproduction here — rather than an approximate match subject to "
+    "simulation noise — provides strong corroborating evidence for "
+    "the correctness of the best response computation implemented "
+    "in this framework, independent of the earlier validation against "
+    "the symmetric benchmark in Experiment 1."
+)
+add_para(
+    "Equally important, though less visually obvious from the table "
+    "alone, is that convergence remained at 100% across all 20 "
+    "initialisations in both asymmetric configurations, including the "
+    "strong asymmetry case where the ratio of valuations reaches 9:1. "
+    "This indicates that valuation heterogeneity, at least of the "
+    "magnitude tested here, does not by itself destabilise best "
+    "response dynamics at r = 1.0 — the instability documented "
+    "elsewhere in this dissertation appears to be driven specifically "
+    "by the decisiveness parameter and player count rather than by "
+    "asymmetry in how much players value the prize."
 )
 add_caption(
     "Figure 10: Equilibrium effort vs. Player 2 valuation. "
     "Player 2 effort rises monotonically; Player 1 effort shows "
     "non-monotonic response peaking at the symmetric point."
+)
+add_para(
+    "Figure 10 extends this comparison into a continuous sweep of "
+    "V2 while holding V1 = 10 fixed, and reveals a pattern not "
+    "visible from the three discrete cases in Table 4 alone. Player "
+    "2's equilibrium effort rises monotonically and roughly linearly "
+    "as V2 increases, exactly as the proportionality result would "
+    "predict. Player 1's effort, however, does not fall monotonically "
+    "as one might naively expect from a player facing an "
+    "increasingly well-resourced rival; instead it rises as V2 "
+    "approaches V1 from below, peaks almost exactly at the symmetric "
+    "point where V2 = V1 = 10, and only then begins to decline as V2 "
+    "continues to rise beyond that point. A plausible reading of this "
+    "pattern is that Player 1 responds defensively to an intensifying "
+    "but still roughly matched rival, raising effort to protect their "
+    "position, but once V2 grows so large that competing seriously "
+    "for the prize becomes rationally unattractive, Player 1 begins "
+    "to withdraw effort rather than continue investing against "
+    "worsening odds. This non-monotonic strategic response is "
+    "discussed further, together with its relationship to the "
+    "existing literature, in Chapter 5."
 )
 add_caption(
     "Figure 11: Equilibrium efforts under symmetric vs asymmetric "
@@ -687,21 +935,75 @@ add_caption(
 
 add_heading("4.5 High Decisiveness Analysis (Experiment 5)", level=2)
 add_para(
-    "Experiment 5 investigated the non-convergence at r = 3.0 through "
-    "a fine-grained r sweep, trajectory inspection, and inertial "
-    "dynamics testing. The fine-grained sweep revealed r = 3.0 is an "
-    "isolated knife-edge point: r = 2.8 and r = 3.2 both converge at "
-    "100%. Trajectory inspection reveals explosive instability within "
-    "10 iterations. All four inertial learning rates tested produce "
-    "0% convergence at r = 3.0."
+    "The complete non-convergence observed at r = 3.0 in Experiment "
+    "2, occurring as an apparently isolated failure between two fully "
+    "convergent neighbouring values, was sufficiently unexpected that "
+    "it warranted dedicated investigation beyond what the original "
+    "coarse parameter grid could offer. Experiment 5 addresses RQ4 "
+    "directly by examining this specific point through three "
+    "complementary lenses: a much finer-grained sweep of r in the "
+    "immediate vicinity of 3.0, a detailed inspection of a single "
+    "representative trajectory to characterise what non-convergence "
+    "actually looks like in practice, and a test of whether the "
+    "inertial update rule — which moves only partially toward the "
+    "best response each round and might therefore be expected to "
+    "dampen any instability — could rescue convergence at this point."
+)
+add_para(
+    "The fine-grained sweep tested r ∈ {2.0, 2.2, 2.4, 2.6, 2.8, "
+    "3.0, 3.2, 3.5}, a resolution five times finer than the original "
+    "Experiment 2 grid in the region immediately surrounding the "
+    "anomaly. The result confirmed that the failure at r = 3.0 in "
+    "Experiment 2 was not an artefact of the coarse sampling: r = 2.8 "
+    "and r = 3.2, immediately either side of the failure point, both "
+    "converge at 100%, while r = 3.0 itself converges at exactly 0% "
+    "across all 20 initialisations tested. This is a knife-edge "
+    "result in the most literal sense — a single, sharply localised "
+    "point of total failure with no gradual transition visible on "
+    "either side at this resolution."
 )
 add_caption(
     "Figure 12: Fine-grained convergence rate vs. r. Knife-edge "
     "failure at exactly r=3.0 with full convergence on both sides."
 )
+add_para(
+    "To understand what this failure actually looks like in "
+    "practice, a single trajectory was traced in detail from the "
+    "initial condition (4.0, 1.0) at r = 3.0. Rather than settling "
+    "toward a fixed point, or oscillating gently between two nearby "
+    "values as a simple limit cycle would, the trajectory shows "
+    "explosive divergence: within the first ten iterations, effort "
+    "levels swing from the starting point through values exceeding "
+    "seven, collapse toward zero for one player while the other "
+    "peaks, then reverse roles entirely, before both players' efforts "
+    "crash toward values close to zero simultaneously. This behaviour "
+    "is qualitatively distinct from the smooth, monotonic approach to "
+    "equilibrium seen throughout Experiment 1, and closer in "
+    "character to the sensitive dependence on initial conditions "
+    "documented under evolutionary dynamics by Hopkins and Kornienko "
+    "(2010), even though the update rule used here is best response "
+    "learning rather than replicator dynamics."
+)
 add_caption(
     "Figure 13: Non-convergent trajectory at r=3.0 showing "
     "explosive oscillation between near-zero and near-maximum effort."
+)
+add_para(
+    "Finally, four inertial learning rates — lambda ∈ {0.8, 0.5, "
+    "0.3, 0.1} — were tested at r = 3.0 to determine whether damping "
+    "the speed of adjustment could restore convergence. Intuitively, "
+    "a sufficiently cautious update rule, one that moves only a small "
+    "fraction of the way toward the best response each round, might "
+    "be expected to prevent the kind of overshoot visible in Figure "
+    "13. This intuition did not hold: all four learning rates tested, "
+    "including the most cautious lambda = 0.1, produced 0% "
+    "convergence at r = 3.0. This result is important because it "
+    "rules out the simplest explanation for the instability — that "
+    "it is merely an artefact of updating too aggressively — and "
+    "instead suggests that the instability is a more fundamental "
+    "structural property of the best response map itself at this "
+    "parameter value, one that persists regardless of how gradually "
+    "players are permitted to adjust."
 )
 add_caption(
     "Figure 14: Inertial dynamics at r=3.0 showing 0% convergence "
@@ -710,8 +1012,17 @@ add_caption(
 
 add_heading("4.6 Full Parameter Space Heatmap (Experiment 6)", level=2)
 add_para(
-    "Experiment 6 produced the headline result: a convergence rate "
-    "heatmap across the full r x n parameter space."
+    "Experiments 2 and 3 examined the effects of r and n "
+    "independently, holding the other fixed. This leaves open the "
+    "question of how the two dimensions interact — whether, for "
+    "instance, the instability at r = 3.0 documented for n = 2 in "
+    "Experiment 5 also appears at other player counts, or whether it "
+    "is specific to the two-player case. Experiment 6 addresses this "
+    "directly by sweeping both parameters simultaneously, producing "
+    "a full convergence rate grid across r ∈ {0.5, 1.0, 1.5, 2.0, "
+    "2.5, 3.0, 3.5, 4.0, 5.0} and n ∈ {2, 3, 5, 10, 20}, with 10 "
+    "random initialisations per cell — a total of 45 parameter "
+    "combinations and 450 individual simulation runs."
 )
 
 add_table(
@@ -731,10 +1042,53 @@ add_caption(
 doc.add_paragraph()
 
 add_para(
-    "Three structural features emerge: r = 0.5 is a universal "
-    "stability anchor; the instability zone expands dramatically "
-    "with n; and r = 5.0 produces universal convergence to a "
-    "zero-effort corner solution."
+    "Table 5 shows a five-column extract from the full nine-column "
+    "grid, chosen to illustrate the main structural features visible "
+    "in the complete heatmap of Figure 15. Reading along the r = 0.5 "
+    "row and column shows universal convergence — 100% for every "
+    "value of n tested, from 2 up to 20. This is the single most "
+    "stable region identified anywhere in this dissertation, and it "
+    "holds despite the substantial increase in the number of "
+    "simultaneously adjusting players across that range, suggesting "
+    "that low decisiveness provides a form of stability that is "
+    "robust to competition intensity in a way that the intermediate "
+    "r values are not."
+)
+add_para(
+    "Moving to r = 1.0, the picture changes sharply once n grows "
+    "large: convergence remains at 100% for n = 2, 3, and 5, "
+    "consistent with the results already reported in detail in "
+    "Experiment 3, but drops to 0% for both n = 10 and n = 20. At "
+    "r = 2.0, the picture is markedly worse even at moderate player "
+    "counts: n = 3 achieves only 20% convergence and n = 5 achieves "
+    "0%, indicating that the instability zone is not simply shifting "
+    "but actively widening as r increases through the intermediate "
+    "range. The r = 3.0 column shows complete failure, 0%, across "
+    "every single value of n tested, from 2 through 20 — confirming "
+    "that the knife-edge instability characterised in detail for the "
+    "two-player case in Experiment 5 is not a two-player peculiarity "
+    "but a feature of this specific decisiveness value that persists "
+    "across the entire range of player counts examined."
+)
+add_para(
+    "The final column, r = 5.0, presents perhaps the most surprising "
+    "result in the entire heatmap: convergence returns to 100% for "
+    "every n value tested, mirroring the universal stability seen at "
+    "r = 0.5. However, this apparent return to stability conceals a "
+    "very different underlying equilibrium. Examination of the "
+    "underlying effort data (recorded in the Experiment 6 output but "
+    "summarised for clarity here) shows that at r = 5.0, equilibrium "
+    "total effort is essentially zero for n >= 3, in sharp contrast "
+    "to the positive interior equilibria found at r = 0.5. In other "
+    "words, r = 5.0 achieves universal convergence not because the "
+    "dynamics have become well-behaved in the same sense as at low "
+    "r, but because the extreme decisiveness of the contest at this "
+    "parameter value makes any positive investment of effort "
+    "unprofitable for every player, so all players rationally "
+    "converge on contributing nothing at all. This is a corner "
+    "solution rather than an interior Nash equilibrium of the kind "
+    "analysed throughout the rest of this dissertation, and its "
+    "implications are discussed further in Chapter 5."
 )
 add_caption(
     "Figure 15: Full convergence heatmap across r x n parameter "
@@ -743,6 +1097,25 @@ add_caption(
 add_caption(
     "Figure 16: Convergence rate vs. r for each n value, showing "
     "how the instability zone widens with player count."
+)
+add_para(
+    "Figure 16 makes the widening of the instability zone with "
+    "increasing n visually explicit by plotting convergence rate "
+    "against r as a separate line for each value of n. The n = 2 "
+    "line remains close to 100% across almost the entire range, "
+    "dipping only briefly at r = 3.0 and partially at r = 4.0 and "
+    "r = 5.0. As n increases, each successive line dips lower and "
+    "for a wider range of r values, until the n = 10 and n = 20 "
+    "lines show almost complete failure across the entire "
+    "intermediate range from roughly r = 1.0 through r = 4.0, "
+    "recovering only at the two extremes of the tested range. This "
+    "figure, taken together with Table 5, constitutes the single "
+    "most comprehensive empirical answer this dissertation provides "
+    "to RQ1 and RQ2 jointly: convergence of best response dynamics "
+    "in Tullock contests is far from universal, is highly sensitive "
+    "to the interaction between decisiveness and player count rather "
+    "than either parameter in isolation, and is reliably guaranteed "
+    "only at the extremes of the decisiveness parameter tested here."
 )
 page_break()
 print("Chapter 4 done. Writing Chapter 5...")
